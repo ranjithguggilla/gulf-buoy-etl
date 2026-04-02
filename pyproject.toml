@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gulf-buoy-etl"
+version = "1.0.0"
+description = "Autonomous Linux ETL pipeline for Gulf of Mexico TABS + NDBC buoy data — idempotent NetCDF archives with SHA-256 fixity, FAIR-compliant monthly aggregations, and automated Zenodo DOI minting"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    {name = "Ranjith Guggilla"},
+]
+keywords = [
+    "oceanography", "buoy", "NDBC", "TABS", "ETL", "FAIR", "NetCDF",
+    "Gulf-of-Mexico", "time-series", "Zenodo", "DOI", "GRIIDC",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Scientific/Engineering :: Oceanography",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "click>=8.0",
+    "requests>=2.31",
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "xarray>=2024.0",
+    "netcdf4>=1.6",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "responses>=0.24",
+    "ruff>=0.4",
+]
+publish = [
+    "lxml>=4.9",
+]
+
+[project.scripts]
+gbe = "gbe.cli:main"
+
+[project.urls]
+Repository = "https://github.com/ranjithguggilla/gulf-buoy-etl"
+Documentation = "https://ranjithguggilla.github.io/gulf-buoy-etl/"
+
+[tool.setuptools.packages.find]
+include = ["gbe*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
