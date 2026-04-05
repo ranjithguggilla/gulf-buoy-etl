@@ -1,0 +1,33 @@
+# Production station list — Gulf of Mexico
+# Modify and re-run `gbe pull` to add stations. No restart needed.
+
+stations:
+  - id: "42002"
+    name: "Central Gulf of Mexico"
+    source: "ndbc"
+    latitude:  26.055
+    longitude: -93.646
+    description: "3-meter discus buoy operated by NDBC; central Gulf."
+
+  - id: "42019"
+    name: "Freeport, TX"
+    source: "tabs"
+    tabs_alias: "B"
+    latitude:  27.910
+    longitude: -95.345
+    description: "TABS Buoy B; outer Texas shelf off Freeport."
+
+  - id: "42020"
+    name: "Corpus Christi, TX"
+    source: "tabs"
+    tabs_alias: "V"
+    latitude:  26.967
+    longitude: -96.694
+    description: "TABS Buoy V; offshore Corpus Christi."
+
+  - id: "42035"
+    name: "Galveston Bay Entrance"
+    source: "ndbc"
+    latitude:  29.232
+    longitude: -94.413
+    description: "3-meter discus, mouth of Galveston Bay."
