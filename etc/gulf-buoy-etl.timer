@@ -1,0 +1,13 @@
+[Unit]
+Description=Schedule nightly Gulf buoy ETL
+Documentation=https://github.com/ranjithguggilla/gulf-buoy-etl
+
+[Timer]
+# 02:15 UTC every day, persistent so missed runs (host offline) fire on boot
+OnCalendar=*-*-* 02:15:00 UTC
+RandomizedDelaySec=15min
+Persistent=true
+Unit=gulf-buoy-etl.service
+
+[Install]
+WantedBy=timers.target

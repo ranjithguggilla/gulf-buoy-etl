@@ -1,0 +1,22 @@
+[Unit]
+Description=Gulf of Mexico buoy ETL — nightly run
+Documentation=https://github.com/ranjithguggilla/gulf-buoy-etl
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=gbe
+Group=gbe
+WorkingDirectory=/opt/gulf-buoy-etl
+ExecStart=/opt/gulf-buoy-etl/bin/nightly.sh
+Nice=10
+ProtectSystem=strict
+ReadWritePaths=/opt/gulf-buoy-etl/archive /opt/gulf-buoy-etl/data /opt/gulf-buoy-etl/logs
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+TimeoutStartSec=30min
+
+[Install]
+WantedBy=multi-user.target

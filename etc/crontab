@@ -1,0 +1,15 @@
+# gulf-buoy-etl crontab
+# Install with:  crontab -u gbe etc/crontab
+#
+# Runs every night at 02:15 UTC. The script uses flock internally so
+# overlapping invocations are safe.
+
+MAILTO=ops@example.org
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Nightly buoy pull + transform + QC report
+15 2 * * * cd /opt/gulf-buoy-etl && ./bin/nightly.sh
+
+# Monthly publish (mint Zenodo DOI for the previous month) — runs on the 2nd
+# of each month at 03:30 UTC.
+30 3 2 * * cd /opt/gulf-buoy-etl && gbe publish "$(date -u -d 'last month' +\%Y-\%m)"
