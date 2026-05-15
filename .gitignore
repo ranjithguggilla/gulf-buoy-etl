@@ -29,10 +29,12 @@ Thumbs.db
 
 # Pipeline runtime artefacts (regenerated on every run)
 data/raw/
-archive/daily/
-archive/monthly/
-archive/reports/
+archive/
 logs/
+
+# Generated dashboard pages (rebuilt by `make dashboard`)
+dashboard/status.json
+dashboard/index.html
 
 # Notebook checkpoints
 .ipynb_checkpoints/
