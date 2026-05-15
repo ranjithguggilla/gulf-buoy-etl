@@ -13,7 +13,7 @@ chronological order. Format follows [Keep a Changelog](https://keepachangelog.co
 - Markdown QC reports (gap, range-violation, uptime tables).
 - Exponential-backoff retry on transient network errors.
 - Prometheus text-format metrics endpoint.
-- Zenodo DOI minting for monthly submission packages (stubbed for sandbox).
+- Zenodo DOI minting for monthly data packages (stubbed for sandbox).
 - systemd timer + crontab for unattended nightly runs.
 - GitHub Pages status dashboard.
 

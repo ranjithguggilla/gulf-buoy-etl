@@ -115,7 +115,7 @@ Each NetCDF gets a sidecar `{name}.nc.sha256` in the format
 compatible with `sha256sum -c`. The monthly aggregator also produces a
 `MANIFEST.sha256` covering all files in the package.
 
-## 4. Monthly Submission Package
+## 4. Monthly Data Package
 
 Layout of `archive/monthly/gulf-buoy-{YYYY-MM}.tar.gz`:
 

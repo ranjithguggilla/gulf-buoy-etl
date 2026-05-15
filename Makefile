@@ -17,7 +17,7 @@ help:
 	@echo "  demo        run pipeline end-to-end on sample fixtures (no network)"
 	@echo "  run         run pipeline against live NDBC + TABS"
 	@echo "  verify      sha256sum -c every archive sidecar"
-	@echo "  monthly     dry-run build the monthly submission package"
+	@echo "  monthly     dry-run build the monthly data package"
 	@echo "  dashboard   generate dashboard/status.json + index.html"
 	@echo "  clean       remove build artefacts and caches"
 

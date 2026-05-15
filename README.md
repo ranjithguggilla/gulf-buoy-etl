@@ -1,6 +1,6 @@
 # gulf-buoy-etl
 
-**Production-grade autonomous ETL pipeline for Gulf of Mexico buoy data — pulls NDBC + TABS feeds nightly, validates, transforms to CF-1.8 NetCDF with SHA-256 fixity, generates Markdown QC reports + Prometheus metrics, and mints monthly Zenodo DOIs.**
+**Autonomous Linux ETL pipeline for Gulf of Mexico buoy data — pulls NDBC + TABS feeds nightly, validates, transforms to CF-1.8 NetCDF with SHA-256 fixity, generates Markdown QC reports + Prometheus metrics, and mints monthly Zenodo DOIs.**
 
 [![CI](https://github.com/ranjithguggilla/gulf-buoy-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/ranjithguggilla/gulf-buoy-etl/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue)](https://www.python.org/)
@@ -37,7 +37,7 @@
 18. [Test cases](#test-cases)
 19. [Outputs](#outputs)
 20. [Project layout](#project-layout)
-21. [Engineering highlights](#engineering-highlights)
+21. [Engineering notes](#engineering-notes)
 
 ---
 
@@ -65,7 +65,7 @@ Ocean-data archives operate a service that looks superficially simple — *recei
 - **Re-runs must be safe.** An ops engineer should be able to re-execute the pipeline on yesterday's data and get a byte-identical archive; no double-counting, no drift.
 - **Standards are mandatory.** Researchers consuming the archive expect CF Conventions, ACDD, ISO 19115-2, and a citable DOI — not whatever local schema happened to be convenient.
 
-This project is my personal exploration of what a production-grade implementation of that workflow looks like, end-to-end, on Linux.
+I built this to teach myself, end-to-end, what an autonomous, idempotent, FAIR-compliant version of that workflow looks like on Linux.
 
 ---
 
@@ -246,7 +246,7 @@ gbe_bytes_pulled_total{station="42019"} 12354
 
 - `gbe.archive.aggregate_month`: walks `archive/daily/`, copies matching files into `archive/monthly/gulf-buoy-2026-04/`, writes a `README.txt`, builds `MANIFEST.sha256`, drops an ISO 19115-2 stub `metadata.xml`, and tars/gzips.
 - `gbe.publish.publish_to_zenodo`: creates a deposition, uploads the tarball into the deposition's bucket, attaches Zenodo metadata (title, creators, keywords, license, related identifiers pointing at NDBC + TABS as source), and publishes — returning the minted DOI.
-- The DOI is appended to `CHANGELOG.md` for the next iteration's submission package.
+- The DOI is appended to `CHANGELOG.md` for the next iteration's data package.
 
 ---
 
@@ -346,7 +346,7 @@ Jitter spreads retries across competing clients so we don't all hit the recoveri
 Markdown:
 - Renders inline on GitHub, in any IDE, and any text terminal.
 - Diffs cleanly under version control.
-- Roundtrips to PDF via pandoc for archive-quality submission docs.
+- Roundtrips to PDF via pandoc for archive-quality archive-quality docs.
 - Doesn't require a UI to consume.
 
 A web dashboard is great for ops, but a 4 AM page should land in your terminal, not require a browser. `gbe qc-report` produces the same content in both formats.
@@ -573,16 +573,16 @@ gulf-buoy-etl/
 
 ---
 
-## Engineering highlights
+## Engineering notes
 
-A few aspects of this pipeline that I find interesting and that took the most thought to get right:
+A few implementation details that took the most thought:
 
-- **Real, public, geographically-relevant data** — TABS and NDBC Gulf of Mexico buoys, with two parsers reduced to a single canonical schema.
-- **A complete data package** — daily NetCDFs, SHA-256 fixity, ISO 19115-2 sidecar, README, CHANGELOG — assembled and DOI-minted on a monthly cadence with no human intervention.
-- **A Bash driver script that runs reproducibly on Linux** — `bin/nightly.sh` is the only entrypoint a sysadmin needs to know about.
-- **Standards compliance enforced in code, not in documentation** — CF-1.8, ACDD-1.3, FAIR, WOCE QC flags, all surfaced as automated tests.
-- **Operational thinking** — Prometheus metrics, log rotation, lockfiles, exponential backoff, idempotence, systemd sandboxing. Not just code that runs once on a developer laptop.
-- **Shell + Python, with the right tool for each job** — orchestration in shell (lock, log, tee), data manipulation in Python. No bash one-liner pretending to be a data pipeline; no Python script reinventing process supervision.
+- **Two source formats, one schema.** NDBC realtime2 (fixed-width ASCII) and TABS (CSV) are parsed into the same canonical column set, so validation, transform, and write paths are source-agnostic.
+- **Idempotent NetCDF.** Re-running on the same input bytes produces NetCDF with the same SHA-256: `date_created` truncated to whole seconds, encoding pinned, no auto-history.
+- **Per-file SHA-256 sidecars** plus a per-month aggregated `MANIFEST.sha256` that re-runs `sha256sum -c` clean.
+- **Shell handles orchestration; Python handles data.** `bin/nightly.sh` does the lockfile, log tee, log rotation, virtualenv activation, and exit-code propagation. The `gbe` Click CLI does parsing, validation, and NetCDF writing.
+- **Range gates + WOCE QC flags surfaced as test invariants.** A bad value should flip exactly one cell's `_qc` companion from 1 → 2 and leave everything else alone; the tests check that explicitly.
+- **Telemetry is plain text.** `archive/metrics.prom` is Prometheus text format with no exporter required — `node_exporter`'s textfile collector picks it up.
 
 Adding a new buoy network is a four-line change to `etc/stations.yaml` plus one parser module if the format is new — everything downstream is source-agnostic.
 

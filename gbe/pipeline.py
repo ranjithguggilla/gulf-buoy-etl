@@ -147,7 +147,7 @@ class Pipeline:
         return write_qc_report(report_path, md)
 
     def aggregate_month(self, month: str) -> Path:
-        """Build the monthly submission package for `month` (YYYY-MM)."""
+        """Build the monthly data package for `month` (YYYY-MM)."""
         _, tarball = aggregate_month(
             month=month,
             daily_root=self.archive_root / "daily",

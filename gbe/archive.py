@@ -122,7 +122,7 @@ def aggregate_month(
     changelog_path: Path | None = None,
 ) -> Tuple[Path, Path]:
     """
-    Build a monthly submission package.
+    Build a monthly data package.
 
     Args:
         month: Target month "YYYY-MM".

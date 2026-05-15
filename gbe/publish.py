@@ -1,5 +1,5 @@
 """
-Zenodo DOI minting for monthly submission packages.
+Zenodo DOI minting for monthly data packages.
 
 In production:
   export ZENODO_TOKEN=<personal access token>
@@ -98,7 +98,7 @@ def publish_to_zenodo(
     dry_run: bool = False,
 ) -> Optional[str]:
     """
-    Mint a DOI for a monthly submission package on Zenodo.
+    Mint a DOI for a monthly data package on Zenodo.
 
     Args:
         tarball: Path to gulf-buoy-{month}.tar.gz.
