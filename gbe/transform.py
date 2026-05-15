@@ -142,7 +142,7 @@ def to_xarray(df: pd.DataFrame, station: Station) -> xr.Dataset:
         "date_created": now_utc,
         "creator_name": "gulf-buoy-etl pipeline",
         "creator_type": "software",
-        "naming_authority": "edu.tamucc.griidc",
+        "naming_authority": "io.github.ranjithguggilla.gulf-buoy-etl",
         "license": "CC-BY-4.0",
         "history": "gbe transform v1.0.0",
         "references": (

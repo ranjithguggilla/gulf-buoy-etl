@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = [
     "oceanography", "buoy", "NDBC", "TABS", "ETL", "FAIR", "NetCDF",
-    "Gulf-of-Mexico", "time-series", "Zenodo", "DOI", "GRIIDC",
+    "Gulf-of-Mexico", "time-series", "Zenodo", "DOI",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

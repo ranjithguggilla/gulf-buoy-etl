@@ -37,7 +37,7 @@
 18. [Test cases](#test-cases)
 19. [Outputs](#outputs)
 20. [Project layout](#project-layout)
-21. [What this proves](#what-this-proves)
+21. [Engineering highlights](#engineering-highlights)
 
 ---
 
@@ -48,7 +48,7 @@ Every night, on a Linux host with no human intervention:
 1. **Pulls** ~24 hours × N stations of buoy observations from NOAA NDBC and TABS (GERG, Texas A&M).
 2. **Validates** every record: timestamp monotonicity, physical-range gates per variable (wind speed 0–100 m s⁻¹, sea-water temp −2 to +40 °C, etc.), and gap detection (≥ 1.5 h).
 3. **Transforms** the raw text into CF-1.8 + ACDD-1.3 compliant NetCDF-4 files, one per station per UTC day, with embedded WOCE-style QC flags, CF `standard_name` attributes, ACDD discovery metadata, and per-file SHA-256 fixity sidecars.
-4. **Aggregates** monthly: builds a GRIIDC-style submission package (`tar.gz` with `MANIFEST.sha256`, `README.txt`, `metadata.xml` ISO 19115-2 sidecar, and a copy of `CHANGELOG.md`).
+4. **Aggregates** monthly: builds a FAIR-compliant data package (`tar.gz` with `MANIFEST.sha256`, `README.txt`, `metadata.xml` ISO 19115-2 sidecar, and a copy of `CHANGELOG.md`).
 5. **Publishes** the monthly tarball to Zenodo via REST API, minting a permanent DOI.
 6. **Reports** an operator-readable Markdown QC report plus Prometheus-scrapeable metrics — viewable as a GitHub Pages dashboard.
 
@@ -58,14 +58,14 @@ It's idempotent (re-running on the same input produces byte-identical NetCDF out
 
 ## Why this matters
 
-GRIIDC and similar ocean-data archives operate a service that looks superficially simple — *receive instrument data, validate it, archive it with metadata* — but every step is unforgiving:
+Ocean-data archives operate a service that looks superficially simple — *receive instrument data, validate it, archive it with metadata* — but every step is unforgiving:
 
 - **Provenance must be unbroken.** Every byte in the archive must trace back to a known source pull with a verifiable checksum.
 - **Failures must be visible.** A buoy that goes dark cannot be silently ignored — a QC report must record it, and metrics must reflect it.
 - **Re-runs must be safe.** An ops engineer should be able to re-execute the pipeline on yesterday's data and get a byte-identical archive; no double-counting, no drift.
 - **Standards are mandatory.** Researchers consuming the archive expect CF Conventions, ACDD, ISO 19115-2, and a citable DOI — not whatever local schema happened to be convenient.
 
-This project demonstrates that I can build that service end-to-end, on Linux, in production-grade Python and shell, with the discipline expected of a data-curation engineering role.
+This project is my personal exploration of what a production-grade implementation of that workflow looks like, end-to-end, on Linux.
 
 ---
 
@@ -119,7 +119,7 @@ The orchestrator (`bin/nightly.sh`) is **pure Bash**: lockfile via `flock`, log 
 - ✅ **WOCE-style QC flags** — every measurement variable gets a paired `{var}_qc` int8 column (1=good, 2=suspect, 9=missing).
 - ✅ **Idempotent NetCDF write** — deterministic `date_created` (whole-second precision), explicit encoding, no auto-history.
 - ✅ **SHA-256 fixity** — every produced NetCDF gets a `.sha256` sidecar; `bin/verify_archive.sh` re-validates the whole archive.
-- ✅ **Monthly submission package** — GRIIDC-style tarball with manifest, README, ISO 19115-2 XML, CHANGELOG.
+- ✅ **Monthly data package** — FAIR-compliant tarball with manifest, README, ISO 19115-2 XML, CHANGELOG.
 - ✅ **Zenodo DOI** — REST API deposition + upload + publish, with a no-token "dry-run" mode for CI.
 - ✅ **Prometheus metrics** — `gbe_run_duration_seconds`, `gbe_bytes_pulled_total{station=…}`, `gbe_files_written_total`, `gbe_stations_{succeeded,failed}_total`, `gbe_last_run_unixtime`.
 - ✅ **GitHub Pages dashboard** — auto-generated `dashboard/index.html` showing per-station status.
@@ -573,18 +573,18 @@ gulf-buoy-etl/
 
 ---
 
-## What this proves
+## Engineering highlights
 
-This pipeline maps directly onto the day-to-day work of an ocean-data curation engineer at GRIIDC:
+A few aspects of this pipeline that I find interesting and that took the most thought to get right:
 
-- **Real, public, geographically-relevant data** — TABS and NDBC Gulf of Mexico buoys, the same observations GRIIDC catalogues and serves.
-- **A complete submission package** — daily NetCDFs, SHA-256 fixity, ISO 19115-2 sidecar, README, CHANGELOG — assembled and DOI-minted on a monthly cadence with no human intervention.
+- **Real, public, geographically-relevant data** — TABS and NDBC Gulf of Mexico buoys, with two parsers reduced to a single canonical schema.
+- **A complete data package** — daily NetCDFs, SHA-256 fixity, ISO 19115-2 sidecar, README, CHANGELOG — assembled and DOI-minted on a monthly cadence with no human intervention.
 - **A Bash driver script that runs reproducibly on Linux** — `bin/nightly.sh` is the only entrypoint a sysadmin needs to know about.
 - **Standards compliance enforced in code, not in documentation** — CF-1.8, ACDD-1.3, FAIR, WOCE QC flags, all surfaced as automated tests.
 - **Operational thinking** — Prometheus metrics, log rotation, lockfiles, exponential backoff, idempotence, systemd sandboxing. Not just code that runs once on a developer laptop.
 - **Shell + Python, with the right tool for each job** — orchestration in shell (lock, log, tee), data manipulation in Python. No bash one-liner pretending to be a data pipeline; no Python script reinventing process supervision.
 
-If GRIIDC handed me a new buoy network tomorrow, the change set would be: add four rows to `etc/stations.yaml`, write one parser module if the format is new, and let the timer pick it up.
+Adding a new buoy network is a four-line change to `etc/stations.yaml` plus one parser module if the format is new — everything downstream is source-agnostic.
 
 ---
 

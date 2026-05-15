@@ -1,7 +1,7 @@
 """
-Monthly aggregation + GRIIDC-style submission package.
+Monthly aggregation into a FAIR data package.
 
-A submission package for month YYYY-MM contains:
+A monthly package for YYYY-MM contains:
     {station}/{day}.nc        — daily NetCDFs
     {station}/{day}.nc.sha256 — fixity sidecar
     README.txt                — what's in this package
@@ -23,13 +23,13 @@ from gbe.transform import sha256_file
 logger = logging.getLogger(__name__)
 
 
-README_TEMPLATE = """GULF BUOY ETL — MONTHLY SUBMISSION PACKAGE
-============================================
+README_TEMPLATE = """GULF BUOY ETL — MONTHLY DATA PACKAGE
+======================================
 
 Month: {month}
 Producer: gulf-buoy-etl v{version}
 Generated: {generated_at}
-Package format: GRIIDC-style submission directory
+Package layout: FAIR-compliant archive directory
 
 CONTENTS
 --------
@@ -86,8 +86,8 @@ def build_iso19115_xml(
     Build a minimal ISO 19115-2 sidecar XML.
 
     This is a stub — production deployments should use a templating library
-    like xmltodict or pygeometa. Suitable as a placeholder for GRIIDC
-    submission while still being syntactically valid XML.
+    like xmltodict or pygeometa. Suitable as a placeholder for FAIR-archive
+    deposit while still being syntactically valid XML.
     """
     stations_xml = "\n".join(
         f"    <gmd:platform>{sid}</gmd:platform>" for sid in station_ids
